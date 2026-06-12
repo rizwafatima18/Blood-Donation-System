@@ -1,0 +1,758 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>LifeFlow Pakistan | Premium Blood Donation SaaS Platform</title>
+    <!-- Google Fonts + Font Awesome + Leaflet CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #fafbfd;
+            color: #1a2634;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* Premium Navbar */
+        .navbar {
+            background: rgba(198, 40, 40, 0.98);
+            backdrop-filter: blur(10px);
+            padding: 1rem 3rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.12);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo h2 {
+            color: white;
+            font-weight: 800;
+            font-size: 1.7rem;
+            letter-spacing: -0.3px;
+        }
+
+        .logo span {
+            color: #ffd54f;
+            display: inline-block;
+            animation: heartbeat 1.5s ease infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: #fff5eb;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            padding: 0.5rem 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-links a.active, .nav-links a:hover {
+            border-bottom-color: #ffd54f;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Urgent Banner */
+        .urgent-banner {
+            background: linear-gradient(90deg, #ff6b6b, #c62828);
+            color: white;
+            text-align: center;
+            padding: 0.8rem;
+            font-weight: 700;
+            animation: pulse 1s infinite;
+            cursor: pointer;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 28px;
+            padding: 1.8rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            border: 1px solid rgba(198,40,40,0.15);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(198,40,40,0.15);
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #ffffff 0%, #fff5f0 100%);
+            border-radius: 32px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: "❤️";
+            position: absolute;
+            font-size: 200px;
+            opacity: 0.05;
+            bottom: -50px;
+            right: -50px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #c62828, #e53935);
+            color: white;
+            border: none;
+            padding: 0.9rem 2rem;
+            font-weight: 700;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(198,40,40,0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(198,40,40,0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #c62828;
+            color: #c62828;
+            padding: 0.8rem 1.8rem;
+            font-weight: 600;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-outline:hover {
+            background: #c62828;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #c62828;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 28px;
+            padding: 2rem;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.08);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #4a5568;
+        }
+
+        input, select, textarea {
+            padding: 0.9rem 1rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #c62828;
+            box-shadow: 0 0 0 3px rgba(198,40,40,0.1);
+        }
+
+        .donor-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            border: 1px solid #f0e2dd;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .donor-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        }
+
+        .rating-stars {
+            color: #ffc107;
+            cursor: pointer;
+        }
+
+        .whatsapp-btn {
+            background: #25d366;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        #map {
+            height: 400px;
+            border-radius: 24px;
+            margin-top: 1rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 16px;
+            margin: 1rem 0;
+            display: none;
+        }
+
+        .alert-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #2e7d32;
+            display: block;
+        }
+
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #c62828;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 50px;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .footer {
+            background: #1a2634;
+            color: #a0aec0;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 1rem; flex-direction: column; gap: 1rem; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.full-width { grid-column: span 1; }
+            .container { padding: 0 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="logo">
+        <h2><span>❤️</span> LifeFlow <span>Pakistan</span></h2>
+    </div>
+    <div class="nav-links" id="navLinks">
+        <a href="#" data-page="home" class="active">Home</a>
+        <a href="#" data-page="donate">Donate Blood</a>
+        <a href="#" data-page="request">Request Blood</a>
+        <a href="#" data-page="donors">Find Donors</a>
+        <a href="#" data-page="blog">Awareness</a>
+        <a href="#" data-page="contact">Contact</a>
+        <a href="#" data-page="dashboard">Dashboard</a>
+    </div>
+</div>
+
+<div class="urgent-banner" id="urgentBanner">
+    🔴 URGENT: A+ Blood needed in Lahore & Karachi | O- Critical in Islamabad 🔴
+</div>
+
+<div id="appContainer" class="container"></div>
+
+<div class="footer">
+    <p>© 2025 LifeFlow Pakistan — Premium Blood Donation SaaS Platform | Emergency Helpline: 1911</p>
+    <p style="margin-top: 0.5rem;"><i class="fas fa-shield-alt"></i> Verified Donors | <i class="fas fa-hand-holding-heart"></i> 1000+ Lives Saved | <i class="fab fa-whatsapp"></i> WhatsApp Support: 0300-1234567</p>
+</div>
+
+<script>
+    // ========== DATA STORAGE ==========
+    let donors = [];
+    let bloodRequests = [];
+    let currentUser = null;
+    let donorRatings = {};
+
+    // Generate massive dummy data (50+ donors)
+    function generateDummyData() {
+        const firstNames = ["Ahmed", "Sana", "Bilal", "Fatima", "Usman", "Ayesha", "Hamza", "Zainab", "Ali", "Hira", "Omar", "Maria", "Hassan", "Nida", "Saad", "Mehak", "Fahad", "Sadia", "Taha", "Iqra", "Rizwan", "Kinza", "Shahzad", "Noor", "Waqas", "Eman"];
+        const lastNames = ["Khan", "Malik", "Raza", "Ahmed", "Butt", "Chaudhry", "Sheikh", "Ali", "Hussain", "Abbas"];
+        const cities = ["Lahore", "Karachi", "Islamabad", "Rawalpindi", "Faisalabad", "Multan", "Peshawar", "Quetta", "Hyderabad", "Gujranwala"];
+        const bloodGroups = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
+        
+        for(let i = 1; i <= 55; i++) {
+            const lastDonation = new Date();
+            lastDonation.setDate(lastDonation.getDate() - (Math.random() * 180));
+            donors.push({
+                id: 1000 + i,
+                fullName: `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`,
+                email: `donor${i}@example.com`,
+                phone: `03${Math.floor(Math.random() * 9)}${Math.floor(Math.random() * 10000000).toString().padStart(7, '0')}`,
+                bloodGroup: bloodGroups[Math.floor(Math.random() * bloodGroups.length)],
+                age: 20 + Math.floor(Math.random() * 40),
+                city: cities[Math.floor(Math.random() * cities.length)],
+                gender: Math.random() > 0.5 ? "Male" : "Female",
+                lastDonated: lastDonation.toISOString().split('T')[0],
+                donationCount: 1 + Math.floor(Math.random() * 10),
+                rating: 4 + Math.random(),
+                verified: Math.random() > 0.3
+            });
+        }
+        
+        // Add emergency requests
+        for(let i = 1; i <= 12; i++) {
+            bloodRequests.push({
+                id: 5000 + i,
+                patientName: `Emergency Patient ${i}`,
+                bloodNeeded: bloodGroups[Math.floor(Math.random() * bloodGroups.length)],
+                city: cities[Math.floor(Math.random() * cities.length)],
+                hospital: ["Mayo Hospital", "Jinnah Hospital", "Services Hospital", "Aga Khan"][Math.floor(Math.random() * 4)],
+                contact: `03${Math.floor(Math.random() * 9)}${Math.floor(Math.random() * 10000000)}`,
+                urgency: ["Critical", "High", "Medium"][Math.floor(Math.random() * 3)],
+                units: 1 + Math.floor(Math.random() * 3)
+            });
+        }
+    }
+
+    function loadData() {
+        const storedDonors = localStorage.getItem("lifeflow_donors_premium");
+        if(storedDonors) {
+            donors = JSON.parse(storedDonors);
+        } else {
+            generateDummyData();
+            saveData();
+        }
+        
+        const storedRequests = localStorage.getItem("lifeflow_requests_premium");
+        if(storedRequests) bloodRequests = JSON.parse(storedRequests);
+        else saveData();
+    }
+
+    function saveData() {
+        localStorage.setItem("lifeflow_donors_premium", JSON.stringify(donors));
+        localStorage.setItem("lifeflow_requests_premium", JSON.stringify(bloodRequests));
+    }
+
+    // Eligibility Calculator
+    function isEligibleToDonate(lastDonated, gender) {
+        if(!lastDonated) return true;
+        const last = new Date(lastDonated);
+        const now = new Date();
+        const monthsDiff = (now.getFullYear() - last.getFullYear()) * 12 + (now.getMonth() - last.getMonth());
+        const requiredGap = gender === "Male" ? 3 : 4;
+        return monthsDiff >= requiredGap;
+    }
+
+    // Smart Matching System
+    function smartMatchDonors(bloodNeeded, city) {
+        let eligible = donors.filter(d => {
+            const eligibleStatus = isEligibleToDonate(d.lastDonated, d.gender);
+            return d.bloodGroup === bloodNeeded && d.city.toLowerCase().includes(city.toLowerCase()) && eligibleStatus;
+        });
+        return eligible.sort((a,b) => (b.rating || 0) - (a.rating || 0)).slice(0, 10);
+    }
+
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast-notification';
+        toast.innerHTML = `<i class="fas fa-bell"></i> ${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    }
+
+    // Render Functions
+    let currentPage = "home";
+    
+    function renderPage(page) {
+        currentPage = page;
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            if(link.getAttribute('data-page') === page) link.classList.add('active');
+            else link.classList.remove('active');
+        });
+        const container = document.getElementById("appContainer");
+        if(page === "home") renderHome(container);
+        else if(page === "donate") renderDonate(container);
+        else if(page === "request") renderRequest(container);
+        else if(page === "donors") renderDonors(container);
+        else if(page === "blog") renderBlog(container);
+        else if(page === "contact") renderContact(container);
+        else if(page === "dashboard") renderDashboard(container);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderHome(container) {
+        const totalLives = donors.reduce((sum, d) => sum + (d.donationCount || 1) * 3, 0);
+        container.innerHTML = `
+            <div class="hero-section">
+                <h1 style="font-size: 3rem; font-weight: 800;"><span style="color:#c62828;">Donate Blood,</span> Save Lives ❤️</h1>
+                <p style="font-size: 1.2rem; margin: 1rem 0;">1 donation = 3 lives saved | Join Pakistan's most trusted blood donation network</p>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button class="btn-primary" onclick="renderPage('donate')"><i class="fas fa-tint"></i> Donate Blood</button>
+                    <button class="btn-outline" onclick="renderPage('request')"><i class="fas fa-ambulance"></i> Request Blood</button>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="glass-card"><i class="fas fa-users fa-3x" style="color:#c62828;"></i><div class="stat-number">${donors.length}+</div><p>Active Donors</p></div>
+                <div class="glass-card"><i class="fas fa-heartbeat fa-3x" style="color:#c62828;"></i><div class="stat-number">${totalLives}+</div><p>Lives Saved</p></div>
+                <div class="glass-card"><i class="fas fa-hospital fa-3x" style="color:#c62828;"></i><div class="stat-number">25+</div><p>Partner Hospitals</p></div>
+                <div class="glass-card"><i class="fas fa-check-circle fa-3x" style="color:#c62828;"></i><div class="stat-number">${donors.filter(d=>d.verified).length}</div><p>Verified Donors</p></div>
+            </div>
+            <div class="glass-card">
+                <h3><i class="fas fa-chart-line"></i> Why Donate Blood?</h3>
+                <p>Every 2 seconds, someone needs blood. Cancer patients, accident victims, mothers in childbirth — your donation gives them a second chance at life.</p>
+                <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                    <span class="blood-badge" style="background:#ffebee; padding:0.5rem 1rem;">✅ Safe Process</span>
+                    <span class="blood-badge" style="background:#ffebee; padding:0.5rem 1rem;">🏥 Sterile Equipment</span>
+                    <span class="blood-badge" style="background:#ffebee; padding:0.5rem 1rem;">❤️ Health Checkup Free</span>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderDonate(container) {
+        container.innerHTML = `
+            <div class="hero-section">
+                <h2><i class="fas fa-hand-holding-heart"></i> Become a Donor</h2>
+                <p>Register now and become a lifesaver. Check eligibility below.</p>
+            </div>
+            <div class="form-container">
+                <form id="donorForm">
+                    <div class="form-grid">
+                        <div class="form-group"><label>Full Name *</label><input type="text" id="fullName" required></div>
+                        <div class="form-group"><label>Email *</label><input type="email" id="email" required></div>
+                        <div class="form-group"><label>Phone *</label><input type="tel" id="phone" required></div>
+                        <div class="form-group"><label>Blood Group *</label><select id="bloodGroup"><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>O+</option><option>O-</option><option>AB+</option><option>AB-</option></select></div>
+                        <div class="form-group"><label>Age (18-60) *</label><input type="number" id="age" min="18" max="60" required></div>
+                        <div class="form-group"><label>Gender *</label><select id="gender"><option>Male</option><option>Female</option></select></div>
+                        <div class="form-group"><label>City *</label><input type="text" id="city" required></div>
+                        <div class="form-group"><label>Last Donation Date</label><input type="date" id="lastDonated"></div>
+                    </div>
+                    <div id="eligibilityMsg" style="margin: 1rem 0; padding: 0.8rem; background:#f0f9ff; border-radius:12px;"></div>
+                    <button type="submit" class="btn-primary" style="width:100%;"><i class="fas fa-save"></i> Register as Donor</button>
+                </form>
+            </div>
+        `;
+        
+        const lastDonatedInput = document.getElementById("lastDonated");
+        const genderSelect = document.getElementById("gender");
+        const eligibilityDiv = document.getElementById("eligibilityMsg");
+        
+        function checkEligibility() {
+            const lastDate = lastDonatedInput.value;
+            const gender = genderSelect.value;
+            if(lastDate) {
+                const eligible = isEligibleToDonate(lastDate, gender);
+                eligibilityDiv.innerHTML = eligible ? "✅ You are eligible to donate blood!" : "⚠️ You need to wait before donating again. Male: 3 months gap, Female: 4 months gap.";
+                eligibilityDiv.style.background = eligible ? "#e8f5e9" : "#ffebee";
+            } else {
+                eligibilityDiv.innerHTML = "✅ First-time donor - You are eligible!";
+            }
+        }
+        
+        lastDonatedInput.addEventListener("change", checkEligibility);
+        genderSelect.addEventListener("change", checkEligibility);
+        checkEligibility();
+        
+        document.getElementById("donorForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const newDonor = {
+                id: Date.now(),
+                fullName: document.getElementById("fullName").value,
+                email: document.getElementById("email").value,
+                phone: document.getElementById("phone").value,
+                bloodGroup: document.getElementById("bloodGroup").value,
+                age: parseInt(document.getElementById("age").value),
+                gender: document.getElementById("gender").value,
+                city: document.getElementById("city").value,
+                lastDonated: document.getElementById("lastDonated").value,
+                donationCount: 0,
+                rating: 5,
+                verified: true
+            };
+            donors.push(newDonor);
+            saveData();
+            showToast("🎉 Registration successful! You're now a lifesaver.");
+            renderPage("donors");
+        });
+    }
+
+    function renderRequest(container) {
+        container.innerHTML = `
+            <div class="hero-section">
+                <h2><i class="fas fa-ambulance"></i> Emergency Blood Request</h2>
+                <p>Post urgent requirement - Our system will match you with nearby donors.</p>
+            </div>
+            <div class="form-container">
+                <form id="requestForm">
+                    <div class="form-grid">
+                        <div class="form-group"><label>Patient Name *</label><input id="patientName" required></div>
+                        <div class="form-group"><label>Blood Group Needed *</label><select id="reqBlood"><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>O+</option><option>O-</option><option>AB+</option><option>AB-</option></select></div>
+                        <div class="form-group"><label>City *</label><input id="reqCity" required></div>
+                        <div class="form-group"><label>Hospital *</label><input id="hospital" required></div>
+                        <div class="form-group"><label>Contact Number *</label><input id="contact" required></div>
+                        <div class="form-group"><label>Urgency *</label><select id="urgency"><option>Critical</option><option>High</option><option>Medium</option></select></div>
+                        <div class="form-group full-width"><label>Units Needed</label><input type="number" id="units" value="1"></div>
+                    </div>
+                    <button type="submit" class="btn-primary" style="width:100%;">Post Emergency Request</button>
+                </form>
+                <div id="matchedDonors" style="margin-top: 2rem;"></div>
+            </div>
+        `;
+        
+        document.getElementById("requestForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const bloodNeeded = document.getElementById("reqBlood").value;
+            const city = document.getElementById("reqCity").value;
+            const matched = smartMatchDonors(bloodNeeded, city);
+            
+            const matchedDiv = document.getElementById("matchedDonors");
+            if(matched.length > 0) {
+                matchedDiv.innerHTML = `<h3>🤝 Smart Match: ${matched.length} Donors Found Nearby</h3>${matched.map(d => `
+                    <div class="donor-card">
+                        <div><strong>${d.fullName}</strong> - ${d.bloodGroup}<br>📍 ${d.city}<br>⭐ ${(d.rating || 4).toFixed(1)}/5<br>❤️ ${d.donationCount || 0} donations</div>
+                        <div><a href="https://wa.me/${d.phone}" target="_blank" class="whatsapp-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                        <button class="btn-outline" style="margin-left:0.5rem; padding:0.4rem 1rem;" onclick="window.location.href='tel:${d.phone}'">Call</button></div>
+                    </div>
+                `).join('')}`;
+                showToast(`✅ ${matched.length} potential donors notified via WhatsApp!`);
+            } else {
+                matchedDiv.innerHTML = `<div class="alert alert-success">⚠️ No eligible donors found. Your request has been broadcasted to our network.</div>`;
+            }
+            
+            const newRequest = {
+                id: Date.now(),
+                patientName: document.getElementById("patientName").value,
+                bloodNeeded, city,
+                hospital: document.getElementById("hospital").value,
+                contact: document.getElementById("contact").value,
+                urgency: document.getElementById("urgency").value,
+                units: document.getElementById("units").value
+            };
+            bloodRequests.push(newRequest);
+            saveData();
+        });
+    }
+
+    function renderDonors(container) {
+        container.innerHTML = `
+            <div class="hero-section">
+                <h2><i class="fas fa-map-marker-alt"></i> Find Nearby Donors</h2>
+                <input type="text" id="mapSearchCity" placeholder="Enter your city" style="width:300px; margin-top:1rem;">
+                <button id="locateBtn" class="btn-primary" style="margin-left:0.5rem;"><i class="fas fa-location-dot"></i> Find Near Me</button>
+            </div>
+            <div id="map" style="height: 400px; margin-bottom: 2rem;"></div>
+            <div id="donorsList"></div>
+        `;
+        
+        // Initialize map
+        let map = L.map('map').setView([30.3753, 69.3451], 5);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OpenStreetMap' }).addTo(map);
+        
+        const cityCoords = {
+            "Lahore": [31.5204, 74.3587], "Karachi": [24.8607, 67.0011], "Islamabad": [33.6844, 73.0479],
+            "Rawalpindi": [33.5651, 73.0169], "Faisalabad": [31.4504, 73.1350], "Multan": [30.1575, 71.5249]
+        };
+        
+        document.getElementById("locateBtn").addEventListener("click", () => {
+            const city = document.getElementById("mapSearchCity").value;
+            if(cityCoords[city]) {
+                map.flyTo(cityCoords[city], 12);
+                L.marker(cityCoords[city]).addTo(map).bindPopup(`📍 Donors in ${city}`).openPopup();
+            } else {
+                showToast("City not found in database");
+            }
+        });
+        
+        function displayDonors(filterBlood = "", filterCity = "") {
+            let filtered = donors;
+            if(filterBlood) filtered = filtered.filter(d => d.bloodGroup === filterBlood);
+            if(filterCity) filtered = filtered.filter(d => d.city.toLowerCase().includes(filterCity.toLowerCase()));
+            
+            const donorsDiv = document.getElementById("donorsList");
+            donorsDiv.innerHTML = `
+                <div class="filter-bar" style="display:flex; gap:1rem; margin-bottom:1rem;">
+                    <select id="filterBlood"><option value="">All Groups</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>O+</option><option>O-</option><option>AB+</option><option>AB-</option></select>
+                    <input type="text" id="filterCityInput" placeholder="Filter by city">
+                    <button id="applyFilter" class="btn-primary">Apply</button>
+                </div>
+                <div id="donorCards"></div>
+            `;
+            
+            function renderCards() {
+                const blood = document.getElementById("filterBlood")?.value || "";
+                const city = document.getElementById("filterCityInput")?.value || "";
+                let finalFiltered = donors;
+                if(blood) finalFiltered = finalFiltered.filter(d => d.bloodGroup === blood);
+                if(city) finalFiltered = finalFiltered.filter(d => d.city.toLowerCase().includes(city.toLowerCase()));
+                
+                document.getElementById("donorCards").innerHTML = finalFiltered.map(d => `
+                    <div class="donor-card">
+                        <div><strong>${d.fullName}</strong> <span class="blood-badge">${d.bloodGroup}</span><br>
+                        📍 ${d.city} | 📞 ${d.phone}<br>
+                        ⭐ <span class="rating-stars" data-id="${d.id}">${"★".repeat(Math.floor(d.rating || 4))}${"☆".repeat(5-Math.floor(d.rating || 4))}</span><br>
+                        🩸 Last Donated: ${d.lastDonated || "First time"} | ❤️ ${d.donationCount || 0} donations</div>
+                        <div><a href="https://wa.me/${d.phone}" target="_blank" class="whatsapp-btn"><i class="fab fa-whatsapp"></i> Contact</a></div>
+                    </div>
+                `).join('');
+            }
+            
+            document.getElementById("applyFilter")?.addEventListener("click", renderCards);
+            renderCards();
+        }
+        displayDonors();
+    }
+
+    function renderBlog(container) {
+        container.innerHTML = `
+            <div class="hero-section">
+                <h2><i class="fas fa-newspaper"></i> Blood Donation Awareness</h2>
+                <p>Knowledge saves lives — learn the facts and myths about blood donation.</p>
+            </div>
+            <div class="stats-grid">
+                <div class="glass-card"><h3>💪 Benefits of Donating Blood</h3><p>Reduces heart disease risk, burns calories, free health checkup, and saves lives!</p></div>
+                <div class="glass-card"><h3>❌ Common Myths</h3><p>Myth: Donating blood is painful. Fact: It's a quick pinch. Myth: You'll get weak. Fact: Body replenishes within 24hrs.</p></div>
+                <div class="glass-card"><h3>🥗 Pre-Donation Tips</h3><p>Eat iron-rich foods (spinach, dates), stay hydrated, get good sleep.</p></div>
+                <div class="glass-card"><h3>🏆 Top Donor of the Month</h3><p>${donors.sort((a,b)=> (b.donationCount||0) - (a.donationCount||0))[0]?.fullName || "Ahmed Raza"} with ${donors.sort((a,b)=> (b.donationCount||0) - (a.donationCount||0))[0]?.donationCount || 12} donations!</p></div>
+            </div>
+        `;
+    }
+
+    function renderContact(container) {
+        container.innerHTML = `
+            <div class="hero-section">
+                <h2><i class="fas fa-headset"></i> Contact Us</h2>
+                <p>24/7 Emergency Helpline | WhatsApp Support | Social Media</p>
+            </div>
+            <div class="stats-grid">
+                <div class="glass-card"><i class="fas fa-phone-alt fa-2x"></i><h3>Emergency Hotline</h3><p>1911 (Toll-Free)<br>+92-300-1234567</p></div>
+                <div class="glass-card"><i class="fab fa-whatsapp fa-2x"></i><h3>WhatsApp Support</h3><p>Send "BLOOD" to +92-300-1234567 for instant donor matching</p></div>
+                <div class="glass-card"><i class="fas fa-envelope fa-2x"></i><h3>Email</h3><p>support@lifeflow.pk<br>partners@lifeflow.pk</p></div>
+            </div>
+            <div class="form-container">
+                <h3>Send us a message</h3>
+                <form id="contactForm">
+                    <div class="form-grid">
+                        <div class="form-group"><label>Name</label><input id="contactName" required></div>
+                        <div class="form-group"><label>Email</label><input id="contactEmail" required></div>
+                        <div class="form-group full-width"><label>Message</label><textarea rows="4" required></textarea></div>
+                    </div>
+                    <button type="submit" class="btn-primary" style="width:100%;">Send Message</button>
+                </form>
+            </div>
+        `;
+        document.getElementById("contactForm")?.addEventListener("submit", (e) => {
+            e.preventDefault();
+            showToast("✅ Message sent! We'll respond within 2 hours.");
+        });
+    }
+
+    function renderDashboard(container) {
+        const topDonor = donors.sort((a,b) => (b.donationCount||0) - (a.donationCount||0))[0];
+        container.innerHTML = `
+            <div class="hero-section">
+                <h2><i class="fas fa-chart-line"></i> Donor Dashboard</h2>
+                <p>Track your impact, eligibility, and leaderboard status.</p>
+            </div>
+            <div class="stats-grid">
+                <div class="glass-card"><h3>🏆 Top Donor</h3><p>${topDonor?.fullName}<br>${topDonor?.donationCount || 0} lifetime donations<br>⭐ ${(topDonor?.rating || 5).toFixed(1)}/5 rating</p></div>
+                <div class="glass-card"><h3>📊 Total Impact</h3><p>${donors.reduce((sum,d)=> sum + (d.donationCount||0)*3, 0)} lives saved<br>${donors.length} registered donors<br>${bloodRequests.length} active requests</p></div>
+                <div class="glass-card"><h3>🩸 Eligibility Checker</h3><p>Male: Donate every 3 months<br>Female: Donate every 4 months<br><button class="btn-outline" onclick="renderPage('donate')">Check Now</button></p></div>
+            </div>
+        `;
+    }
+
+    // Event Listeners
+    document.getElementById("urgentBanner")?.addEventListener("click", () => renderPage("request"));
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', (e) => { e.preventDefault(); renderPage(link.getAttribute('data-page')); });
+    });
+    
+    loadData();
+    renderPage("home");
+</script>
+</body>
+</html>
+```
